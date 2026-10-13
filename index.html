@@ -38,12 +38,15 @@ footer{border-top:1px solid var(--line);padding:30px 0 50px;color:#777;font-size
 .empty-state{grid-column:1/-1;background:#fff;border:1px dashed #ddd;border-radius:16px;padding:35px;text-align:center;color:var(--muted)}
 .credits-wrap{text-align:center;display:grid;gap:12px}.credits-names,.credits-bottom{display:flex;justify-content:center;gap:18px;flex-wrap:wrap}.credits-names{font-weight:700;color:#444}.credits-bottom{font-size:11px;letter-spacing:1.5px}
 @media(max-width:560px){.actions{gap:5px}.actions .btn{padding:8px 10px;font-size:12px}.account-pill{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+
+.nearby-panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}.nearby-controls{display:grid;grid-template-columns:1fr 180px auto;gap:10px}.nearby-controls input,.nearby-controls select{min-width:0;border:1px solid #ddd;border-radius:12px;padding:12px;background:#fff}.nearby-status{font-size:13px;color:var(--muted);margin:14px 0}.nearby-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.person-card{border:1px solid var(--line);border-radius:16px;padding:17px;min-width:0}.person-top{display:flex;align-items:center;gap:11px}.person-avatar{width:46px;height:46px;flex:0 0 46px;border-radius:50%;display:grid;place-items:center;background:var(--accent2);font-size:23px}.person-name{font-weight:850}.person-school{font-size:12px;color:var(--muted);margin-top:3px}.person-distance{font-size:12px;margin:13px 0 8px;color:#5145d9;font-weight:800}.person-bio{font-size:13px;line-height:1.5;color:#555;min-height:40px}.person-tags{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.person-tag{font-size:11px;background:#f4f3ff;border-radius:99px;padding:5px 8px}.nearby-disclaimer{font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:14px;margin:18px 0 0}.nearby-empty{grid-column:1/-1;padding:28px;text-align:center;color:var(--muted);background:#fafaf9;border-radius:14px}@media(max-width:900px){.nearby-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nearby-controls{grid-template-columns:1fr 1fr}.nearby-controls button{grid-column:1/-1}}@media(max-width:560px){.nearby-grid{grid-template-columns:1fr}.nearby-controls{grid-template-columns:1fr}.nearby-controls button{grid-column:auto}.nearby-panel{padding:13px}}
+
 </style>
 </head>
 <body>
 <header><div class="container nav">
   <div class="logo">Uni<span>Rent</span></div>
-  <nav class="navlinks"><a href="#browse">Khám phá</a><a href="#safe-rental">Safe Rental</a><a href="#how">Cách hoạt động</a><a href="#sell">Cho thuê</a><a href="#" onclick="event.preventDefault();openModal('rent')">Đăng món đồ</a></nav>
+  <nav class="navlinks"><a href="#browse">Khám phá</a><a href="#nearby">Tìm người gần bạn</a><a href="#safe-rental">Safe Rental</a><a href="#how">Cách hoạt động</a><a href="#sell">Cho thuê</a><a href="#" onclick="event.preventDefault();openModal('rent')">Đăng món đồ</a></nav>
   <div class="actions" id="accountActions"><button class="btn" onclick="openModal('login')">Đăng nhập</button><button class="btn primary" onclick="openModal('register')">Đăng ký</button></div>
 </div></header>
 
@@ -67,6 +70,20 @@ footer{border-top:1px solid var(--line);padding:30px 0 50px;color:#777;font-size
     <button class="chip active" onclick="filterCat('Tất cả',this)">Tất cả</button><button class="chip" onclick="filterCat('Công nghệ',this)">💻 Công nghệ</button><button class="chip" onclick="filterCat('Học tập',this)">📚 Học tập</button><button class="chip" onclick="filterCat('Sự kiện',this)">👗 Sự kiện</button><button class="chip" onclick="filterCat('Lifestyle',this)">🏕️ Lifestyle</button>
   </div>
   <div class="grid" id="products"></div>
+</section>
+
+<section class="section container" id="nearby">
+  <div class="section-head"><div><h2>Find who’s near you</h2><div class="muted">Khám phá cộng đồng sinh viên và người cho thuê quanh khu vực của bạn.</div></div><span class="muted">📍 Ưu tiên quyền riêng tư</span></div>
+  <div class="nearby-panel">
+    <div class="nearby-controls">
+      <input id="nearbySearch" type="search" placeholder="Tìm tên, trường hoặc món đồ…" oninput="renderNearby()" aria-label="Tìm người gần bạn">
+      <select id="nearbyRadius" onchange="renderNearby()" aria-label="Bán kính tìm kiếm"><option value="2">Trong 2 km</option><option value="5" selected>Trong 5 km</option><option value="10">Trong 10 km</option><option value="25">Trong 25 km</option><option value="99999">Mọi khoảng cách</option></select>
+      <button class="btn purple" onclick="enableNearbyLocation()">⌖ Dùng vị trí của tôi</button>
+    </div>
+    <p id="nearbyStatus" class="nearby-status" role="status">Bật vị trí để ước tính khoảng cách. Vị trí chỉ được dùng trong phiên trình duyệt này.</p>
+    <div id="nearbyPeople" class="nearby-grid"></div>
+    <p class="nearby-disclaimer">Lưu ý: các hồ sơ hiện là dữ liệu minh họa để thử giao diện. Website tĩnh hiện tại chưa có máy chủ chung, nên chưa thể tìm người dùng thật giữa các thiết bị hoặc gửi tin nhắn thực. Khoảng cách được tính gần đúng từ vị trí bạn cho phép và khu vực trường học công khai, không phải vị trí trực tiếp của từng người.</p>
+  </div>
 </section>
 
 <section class="section container" id="safe-rental"><div class="section-head"><div><h2>Why Are We Different?</h2><div class="muted">Thuê đồ an tâm hơn — cho cả người thuê và chủ đồ.</div></div></div><div class="safe-grid"><div class="safe-column"><div class="safe-heading"><span class="safe-icon">🤖</span><h3>Smart Matching</h3></div><div class="match-flow"><div><span class="flow-num">1</span><b>Need</b></div><i></i><div><span class="flow-num">2</span><b>Match</b></div><i></i><div><span class="flow-num">3</span><b>Rent</b></div></div><h3 class="match-label">Matches based on:</h3><div class="match-grid"><div class="match-card"><b><em>•</em> Item</b><p>Connects the right item</p></div><div class="match-card"><b><em>•</em> Location</b><p>With the right person</p></div><div class="match-card"><b><em>•</em> Rental time</b><p>At the right time</p></div><div class="match-card"><b><em>•</em> Budget</b><p>At the right price</p></div></div></div><div class="safe-column"><div class="safe-heading"><span class="safe-icon">🛡️</span><h3>Safe Rental</h3></div><div class="safe-list"><div class="safe-row"><span>1</span><div><b>Deposit</b><p>Ensures commitment and item safety</p></div></div><div class="safe-row"><span>2</span><div><b>Rating system</b><p>Builds trust through community feedback</p></div></div><div class="safe-row"><span>3</span><div><b>Secure payment</b><p>Protects financial transactions</p></div></div><div class="safe-row"><span>4</span><div><b>Transaction protection</b><p>Safeguards the rental process</p></div></div></div><div class="safe-note">Together, these elements reduce uncertainty for both renters and owners.</div></div></div></section>
@@ -115,6 +132,31 @@ let currentUser=store.get("session",null);
 let favorites=store.get("favorites",[]);
 let bookings=store.get("bookings",[]);
 let category="Tất cả";
+let nearbyCoordinates=null;
+const demoPeople=[
+ {id:"demo-1",name:"Lan Anh",school:"ĐH Bách Khoa TP.HCM",emoji:"👩🏻‍🎓",lat:10.7721,lng:106.6578,bio:"Có thể cho thuê máy ảnh, laptop và sách học tập.",tags:["Máy ảnh","Laptop","Sách"]},
+ {id:"demo-2",name:"Minh Đức",school:"ĐH Kinh tế TP.HCM (UEH)",emoji:"🧑🏻‍🎓",lat:10.7592,lng:106.7000,bio:"Tìm bạn cùng trường và chia sẻ đồ dùng học tập.",tags:["Máy chiếu","Xe đạp","Học tập"]},
+ {id:"demo-3",name:"Hà My",school:"HUTECH",emoji:"👩🏻",lat:10.8016,lng:106.7148,bio:"Cho thuê đồ sự kiện và phụ kiện chụp ảnh.",tags:["Áo dài","Phụ kiện","Sự kiện"]},
+ {id:"demo-4",name:"Quang Huy",school:"ĐH Tôn Đức Thắng",emoji:"🧑🏻",lat:10.7326,lng:106.6992,bio:"Thích cắm trại, có đồ outdoor cho thuê.",tags:["Lều","GoPro","Camping"]},
+ {id:"demo-5",name:"Thảo Vy",school:"ĐH Sư phạm TP.HCM",emoji:"👩🏽‍🎓",lat:10.7802,lng:106.6822,bio:"Trao đổi sách và đồ dùng cho sinh viên.",tags:["Sách","Máy tính","Học tập"]},
+ {id:"demo-6",name:"Gia Bảo",school:"ĐH Văn Lang",emoji:"🧑🏽‍🎓",lat:10.8266,lng:106.6892,bio:"Có máy ảnh và thiết bị sáng tạo nội dung.",tags:["Máy ảnh","Micro","Camera"]}
+];
+function distanceKm(a,b){const r=Math.PI/180, dLat=(b.lat-a.lat)*r,dLng=(b.lng-a.lng)*r;const h=Math.sin(dLat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLng/2)**2;return 6371*2*Math.atan2(Math.sqrt(h),Math.sqrt(1-h))}
+function enableNearbyLocation(){
+ const status=document.getElementById("nearbyStatus");
+ if(!navigator.geolocation){status.textContent="Trình duyệt này không hỗ trợ định vị. Bạn vẫn có thể tìm theo tên hoặc trường.";return}
+ status.textContent="Đang xin quyền vị trí…";
+ navigator.geolocation.getCurrentPosition(pos=>{nearbyCoordinates={lat:pos.coords.latitude,lng:pos.coords.longitude};status.textContent="Đã bật vị trí cho phiên này. Khoảng cách chỉ là ước tính theo khu vực trường học; vị trí không được lưu.";renderNearby()},err=>{status.textContent=err.code===1?"Bạn chưa cấp quyền vị trí. Hãy cho phép trong cài đặt trình duyệt nếu muốn xem khoảng cách.":"Không lấy được vị trí. Bạn vẫn có thể tìm theo tên hoặc trường.";renderNearby()},{enableHighAccuracy:false,timeout:10000,maximumAge:60000});
+}
+function contactNearbyPerson(id){const person=demoPeople.find(p=>p.id===id);if(!person)return;if(!requireLogin())return;setModal("Kết nối với "+person.name,`<div class="form"><p>Đây là hồ sơ minh họa của <b>${safe(person.name)}</b> — ${safe(person.school)}.</p><p>Tính năng nhắn tin trực tiếp sẽ hoạt động khi UniRent được kết nối với máy chủ và tài khoản người dùng thật.</p><button class="btn primary" onclick="closeModal()">Đã hiểu</button></div>`)}
+function renderNearby(){
+ const root=document.getElementById("nearbyPeople");if(!root)return;
+ const q=(document.getElementById("nearbySearch")?.value||"").trim().toLowerCase(),radius=Number(document.getElementById("nearbyRadius")?.value||5);
+ let people=demoPeople.map(p=>({...p,distance:nearbyCoordinates?distanceKm(nearbyCoordinates,p):null})).filter(p=>`${p.name} ${p.school} ${p.bio} ${p.tags.join(" ")}`.toLowerCase().includes(q));
+ if(nearbyCoordinates&&radius<99999)people=people.filter(p=>p.distance<=radius);
+ if(nearbyCoordinates)people.sort((a,b)=>a.distance-b.distance);
+ root.innerHTML=people.length?people.map(p=>`<article class="person-card"><div class="person-top"><div class="person-avatar" aria-hidden="true">${p.emoji}</div><div><div class="person-name">${safe(p.name)} <span style="color:#16a36a;font-size:11px">●</span></div><div class="person-school">${safe(p.school)}</div></div></div><div class="person-distance">${p.distance===null?"📍 Bật vị trí để xem khoảng cách":"📍 Cách khoảng "+p.distance.toFixed(1)+" km"}</div><div class="person-bio">${safe(p.bio)}</div><div class="person-tags">${p.tags.map(t=>`<span class="person-tag">${safe(t)}</span>`).join("")}</div><button class="btn" style="width:100%" onclick="contactNearbyPerson('${p.id}')">Kết nối</button></article>`).join(""):`<div class="nearby-empty">Không tìm thấy hồ sơ trong bộ lọc này. Thử tăng bán kính hoặc tìm bằng từ khóa khác.</div>`;
+}
 function saveListings(){store.set("listings",data)}
 function safe(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function requireLogin(){if(!currentUser){openModal("login");toast("Bạn cần đăng nhập trước nhé.");return false}return true}
@@ -195,6 +237,7 @@ document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 updateAccountUI();
 render();
+renderNearby();
 </script>
 </body>
 </html>
